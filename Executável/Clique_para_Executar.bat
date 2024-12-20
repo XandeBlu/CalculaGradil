@@ -1,0 +1,1 @@
+java -jar Executavel_Projeto_Weg.jar
