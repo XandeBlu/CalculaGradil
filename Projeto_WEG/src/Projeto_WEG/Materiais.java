@@ -17,7 +17,7 @@ public class Materiais {
     }
 
     public Materiais() {
-        // Construtor padrão
+        
     }
     
     public double getDiferenca() {

@@ -1,5 +1,4 @@
 package Projeto_WEG;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -14,12 +13,10 @@ public class PainelDesenho extends JFrame {
         this.altura = altura;
         this.cor = cor;
         
-        // Configurações básicas da janela
         setTitle("Desenho da Cerca");
         setBounds(100, 100, 800, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
-        // Cria o painel de desenho
         painelDesenho = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -37,20 +34,23 @@ public class PainelDesenho extends JFrame {
         int margemY = 50;
         int larguraMaxima = painelDesenho.getWidth() - (2 * margemX);
         int alturaMaxima = painelDesenho.getHeight() - (2 * margemY);
-
+        
+        double comprimentoLimite = 50.0;
+        double comprimentoDesenho = Math.min(comprimento, comprimentoLimite);
+        
         // Calcula escala para o desenho
-        double escalaX = larguraMaxima / comprimento;
+        double escalaX = larguraMaxima / comprimentoDesenho;
         double escalaY = alturaMaxima / altura;
         double escala = Math.min(escalaX, escalaY) * 0.8; // 80% do tamanho para margem
-
+        
         // Dimensões do desenho
-        int larguraDesenho = (int)(comprimento * escala);
+        int larguraDesenho = (int)(comprimentoDesenho * escala);
         int alturaDesenho = (int)(altura * escala);
-
+        
         // Posição inicial centralizada
         int x = (painelDesenho.getWidth() - larguraDesenho) / 2;
         int y = (painelDesenho.getHeight() - alturaDesenho) / 2;
-
+        
         // Define a cor da cerca
         Color corCerca;
         switch (cor.toLowerCase()) {
@@ -67,31 +67,37 @@ public class PainelDesenho extends JFrame {
                 corCerca = Color.GRAY;
         }
         g.setColor(corCerca);
-
-        // Desenha a base da cerca
+        
         Graphics2D g2d = (Graphics2D) g;
         g2d.setStroke(new BasicStroke(2));
         g.drawLine(x, y + alturaDesenho, x + larguraDesenho, y + alturaDesenho);
-
-        // Desenha os postes
-        double espacoEntrePostes = 2.5; // 2.5 metros
+        
+        // Calcula o número exato de telas e postes
+        int numeroTelas = (int) Math.ceil(comprimentoDesenho / 2.5);
+        int numeroPostes = numeroTelas + 1;
+        double espacoEntrePostes = comprimentoDesenho / (numeroTelas); // Distribui o espaço igualmente
         int espacoEscalado = (int)(espacoEntrePostes * escala);
-        for (int i = x; i <= x + larguraDesenho; i += espacoEscalado) {
-            g.fillRect(i - 3, y, 6, alturaDesenho);
+        
+        // Desenha os postes
+        for (int i = 0; i <= numeroTelas; i++) {
+            int posX = x + (i * espacoEscalado);
+            g.fillRect(posX - 3, y, 6, alturaDesenho);
         }
-
+        
         // Desenha a tela
         g2d.setStroke(new BasicStroke(1));
         int espacoTela = 10;
-        for (int i = x; i <= x + larguraDesenho; i += espacoTela) {
+        // Ajusta o limite do desenho da tela para não passar do último poste
+        int limiteTela = x + larguraDesenho;
+        for (int i = x; i < limiteTela; i += espacoTela) {
             g.drawLine(i, y, i, y + alturaDesenho);
         }
-
+        
         // Desenha as travessas horizontais
         g2d.setStroke(new BasicStroke(2));
         g.drawLine(x, y + alturaDesenho/3, x + larguraDesenho, y + alturaDesenho/3);
         g.drawLine(x, y + 2*alturaDesenho/3, x + larguraDesenho, y + 2*alturaDesenho/3);
-
+        
         // Adiciona informações da cerca
         g.setColor(Color.BLACK);
         Font fonte = new Font("Arial", Font.BOLD, 14);
